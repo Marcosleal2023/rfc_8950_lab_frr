@@ -1,0 +1,15 @@
+## Start lab ##
+containerlab deploy -t topologia.yml 
+
+## Shutdown Lab ##
+containerlab destroy -t topologia.yml
+
+## List containers ##
+docker ps
+
+## Acess container ##
+docker exec -it clab-rfc8950-frr1 vtysh
+
+## Acess host ##
+
+docker exec -it clab-rfc8950-vpc1 bash
