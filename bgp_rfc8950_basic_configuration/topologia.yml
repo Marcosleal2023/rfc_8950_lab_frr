@@ -2,43 +2,57 @@ name: rfc8950
 
 topology:
   nodes:
-    R1:
+    frr1:
       kind: linux
-      image: frrouting/frr:latest
+      image: quay.io/frrouting/frr:10.5.4
       binds:
-        - configs/R1.conf:/etc/frr/frr.conf
-        - configs/daemons:/etc/frr/daemons
+        - /root/rfc8950/daemons:/etc/frr/daemons
+        - /root/rfc8950/r1.cfg:/etc/frr/frr.conf
 
-    R2:
+    frr2:
       kind: linux
-      image: frrouting/frr:latest
+      image: quay.io/frrouting/frr:10.5.4
       binds:
-        - configs/R2.conf:/etc/frr/frr.conf
-        - configs/daemons:/etc/frr/daemons
+        - /root/rfc8950/daemons:/etc/frr/daemons
+        - /root/rfc8950/r2.cfg:/etc/frr/frr.conf
 
-    R3:
+    frr3:
       kind: linux
-      image: frrouting/frr:latest
+      image: quay.io/frrouting/frr:10.5.4
       binds:
-        - configs/R3.conf:/etc/frr/frr.conf
-        - configs/daemons:/etc/frr/daemons
+        - /root/rfc8950/daemons:/etc/frr/daemons
+        - /root/rfc8950/r3.cfg:/etc/frr/frr.conf
 
-    C1:
+    frr4:
       kind: linux
-      image: frrouting/frr:latest
+      image: quay.io/frrouting/frr:10.5.4
       binds:
-        - configs/C1.conf:/etc/frr/frr.conf
-        - configs/daemons:/etc/frr/daemons
-
-    C2:
+        - /root/rfc8950/daemons:/etc/frr/daemons
+        - /root/rfc8950/r4.cfg:/etc/frr/frr.conf
+   
+    frr5:
       kind: linux
-      image: frrouting/frr:latest
+      image: quay.io/frrouting/frr:10.5.4
       binds:
-        - configs/C2.conf:/etc/frr/frr.conf
-        - configs/daemons:/etc/frr/daemons  
+        - /root/rfc8950/daemons:/etc/frr/daemons
+        - /root/rfc8950/r5.cfg:/etc/frr/frr.conf       
+       
+    vpc1:
+      kind: linux
+      image: wbitt/network-multitool:latest
 
   links:
-    - endpoints: ["C1:eth1", "R1:eth1"]
-    - endpoints: ["R1:eth2", "R2:eth1"]
-    - endpoints: ["R2:eth2", "R3:eth1"]
-    - endpoints: ["R3:eth2", "C2:eth1"]
+    # Cliente 1 <-> Transit
+    - endpoints: ["frr1:eth1", "frr4:eth1"]
+
+    # Cliente 2 <-> Transit
+    - endpoints: ["frr2:eth1", "frr4:eth2"]
+
+    # Cliente 3 <-> Transit
+    - endpoints: ["frr3:eth1", "frr4:eth3"]
+    
+    # Google <-> Transit
+    - endpoints: ["frr5:eth1", "frr4:eth4"]  
+
+   # VPC <-> FRR2
+    - endpoints: ["vpc1:eth1", "frr2:eth2"]
